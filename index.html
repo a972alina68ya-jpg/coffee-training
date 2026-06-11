@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кофе: Обучение для официантов</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --espresso: #1C0F0A;
+    --roast:    #3D1F12;
+    --caramel:  #C07B3A;
+    --cream:    #F5EDE0;
+    --milk:     #FBF7F2;
+    --smoke:    #7A6A5E;
+    --white:    #FFFFFF;
+    --green:    #4A7C59;
+    --red:      #B94040;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--milk);
+    color: var(--espresso);
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--espresso);
+    color: var(--cream);
+    padding: 56px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(192,123,58,.18) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--caramel);
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.4rem);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    font-size: 15px;
+    color: rgba(245,237,224,.72);
+    max-width: 520px;
+    margin: 0 auto 32px;
+    line-height: 1.65;
+  }
+  .progress-bar-wrap {
+    max-width: 340px;
+    margin: 0 auto;
+  }
+  .progress-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: rgba(245,237,224,.55);
+    margin-bottom: 7px;
+  }
+  .progress-bar {
+    height: 5px;
+    background: rgba(255,255,255,.12);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--caramel);
+    border-radius: 99px;
+    transition: width .5s ease;
+  }
+
+  /* ── NAV TABS ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    background: var(--roast);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: 0 0 auto;
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(245,237,224,.5);
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all .2s;
+    white-space: nowrap;
+    letter-spacing: .03em;
+  }
+  .tab-btn:hover { color: var(--cream); }
+  .tab-btn.active { color: var(--caramel); border-bottom-color: var(--caramel); }
+  .tab-btn.done { color: rgba(74,124,89,.85); }
+  .tab-btn.done::after { content: ' ✓'; font-size: 11px; }
+
+  /* ── CONTENT ── */
+  .main { max-width: 740px; margin: 0 auto; padding: 36px 20px 80px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-header {
+    margin-bottom: 28px;
+  }
+  .section-header .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--caramel);
+    margin-bottom: 8px;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    line-height: 1.2;
+  }
+  .section-header p {
+    margin-top: 10px;
+    color: var(--smoke);
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+
+  /* ── CARDS ── */
+  .cards { display: grid; gap: 16px; }
+  .cards.two { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+  .card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 22px 24px;
+    border: 1.5px solid rgba(192,123,58,.12);
+    box-shadow: 0 2px 8px rgba(28,15,10,.05);
+  }
+  .card-icon { font-size: 26px; margin-bottom: 10px; }
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+  }
+  .card p {
+    font-size: 13.5px;
+    color: var(--smoke);
+    line-height: 1.65;
+  }
+  .card ul {
+    margin-top: 8px;
+    padding-left: 16px;
+    font-size: 13.5px;
+    color: var(--smoke);
+    line-height: 1.8;
+  }
+
+  /* ── PROCESS STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex;
+    gap: 18px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(192,123,58,.1);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    flex: 0 0 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--caramel);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .step-body h4 {
+    font-weight: 600;
+    font-size: 14.5px;
+    margin-bottom: 4px;
+  }
+  .step-body p {
+    font-size: 13.5px;
+    color: var(--smoke);
+    line-height: 1.6;
+  }
+
+  /* ── RECIPE TABLE ── */
+  .recipe-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin-top: 8px;
+  }
+  .recipe-table thead tr {
+    background: var(--espresso);
+    color: var(--cream);
+  }
+  .recipe-table th, .recipe-table td {
+    padding: 11px 14px;
+    text-align: left;
+  }
+  .recipe-table tbody tr:nth-child(even) {
+    background: rgba(192,123,58,.06);
+  }
+  .recipe-table tbody tr:hover {
+    background: rgba(192,123,58,.12);
+  }
+  .recipe-table td:first-child {
+    font-weight: 600;
+    color: var(--roast);
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .03em;
+  }
+  .badge-milk { background: #EEE4D6; color: #5C3E24; }
+  .badge-dark { background: var(--roast); color: var(--cream); }
+  .badge-light { background: #F5EDE0; color: var(--smoke); }
+  .badge-green { background: #D6EBD9; color: #2D6040; }
+
+  /* ── QUIZ ── */
+  .quiz-wrap { display: flex; flex-direction: column; gap: 24px; }
+  .quiz-q {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 22px 24px;
+    border: 1.5px solid rgba(192,123,58,.12);
+  }
+  .quiz-q .q-text {
+    font-weight: 600;
+    font-size: 14.5px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(28,15,10,.1);
+    cursor: pointer;
+    font-size: 13.5px;
+    transition: all .15s;
+    background: var(--milk);
+    user-select: none;
+  }
+  .quiz-opt:hover { border-color: var(--caramel); background: rgba(192,123,58,.06); }
+  .quiz-opt.selected { border-color: var(--caramel); background: rgba(192,123,58,.1); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(74,124,89,.1); color: var(--green); font-weight: 500; }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(185,64,64,.08); color: var(--red); }
+  .opt-radio {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(28,15,10,.25);
+    flex: 0 0 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .quiz-opt.selected .opt-radio { border-color: var(--caramel); background: var(--caramel); }
+  .quiz-opt.correct .opt-radio { border-color: var(--green); background: var(--green); }
+  .quiz-opt.wrong .opt-radio { border-color: var(--red); background: var(--red); }
+  .hint {
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--smoke);
+    padding: 8px 12px;
+    border-radius: 7px;
+    background: rgba(122,106,94,.08);
+    display: none;
+  }
+  .hint.show { display: block; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .18s;
+    letter-spacing: .02em;
+  }
+  .btn-primary {
+    background: var(--caramel);
+    color: var(--white);
+  }
+  .btn-primary:hover { background: #a8672e; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--caramel);
+    border: 1.5px solid var(--caramel);
+  }
+  .btn-ghost:hover { background: rgba(192,123,58,.08); }
+
+  .quiz-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  /* ── SCORE ── */
+  .score-box {
+    background: var(--espresso);
+    color: var(--cream);
+    border-radius: 18px;
+    padding: 36px;
+    text-align: center;
+    margin-top: 8px;
+    display: none;
+  }
+  .score-box.show { display: block; }
+  .score-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    color: var(--caramel);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .score-msg {
+    font-size: 14px;
+    color: rgba(245,237,224,.7);
+    margin-bottom: 20px;
+  }
+
+  /* ── TIPS ── */
+  .tip-list { display: flex; flex-direction: column; gap: 12px; }
+  .tip {
+    display: flex;
+    gap: 14px;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px 18px;
+    border-left: 4px solid var(--caramel);
+    font-size: 13.5px;
+    color: var(--smoke);
+    line-height: 1.6;
+  }
+  .tip-icon { font-size: 20px; flex: 0 0 auto; margin-top: 1px; }
+  .tip strong { color: var(--espresso); display: block; margin-bottom: 2px; }
+
+  .divider {
+    height: 1px;
+    background: rgba(192,123,58,.15);
+    margin: 28px 0;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 500px) {
+    .hero { padding: 40px 16px 36px; }
+    .main { padding: 24px 14px 60px; }
+    .section-header h2 { font-size: 1.5rem; }
+    .recipe-table { font-size: 12px; }
+    .recipe-table th, .recipe-table td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Учебный модуль · Бариста & Сервис</div>
+  <h1>Кофе для<br>официантов</h1>
+  <p>Всё, что нужно знать, чтобы уверенно рассказать о кофе гостю и правильно его подать.</p>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-label">
+      <span>Прогресс</span>
+      <span id="progressLabel">0 из 4 разделов</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showSection(0)" id="tab0">☕ Зерно</button>
+  <button class="tab-btn" onclick="showSection(1)" id="tab1">⚗️ Напитки</button>
+  <button class="tab-btn" onclick="showSection(2)" id="tab2">🍽️ Сервис</button>
+  <button class="tab-btn" onclick="showSection(3)" id="tab3">✏️ Тест</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ── SECTION 0: ЗЕРНО ── -->
+  <div class="section active" id="sec0">
+    <div class="section-header">
+      <div class="eyebrow">Раздел 1</div>
+      <h2>От зерна до чашки</h2>
+      <p>Прежде чем говорить о напитках, важно понять, откуда берётся вкус.</p>
+    </div>
+
+    <div class="cards two">
+      <div class="card">
+        <div class="card-icon">🌍</div>
+        <h3>Арабика</h3>
+        <p>Самый распространённый сорт. Мягкий, с кислинкой, богатый ароматами. Растёт на высоте 600–2200 м.</p>
+        <ul>
+          <li>Кислотность: средняя-высокая</li>
+          <li>Кофеин: ~1.2%</li>
+          <li>Вкус: фрукты, цветы, карамель</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌿</div>
+        <h3>Робуста</h3>
+        <p>Более крепкая и горькая, с плотным телом. Часто добавляется в смеси для эспрессо.</p>
+        <ul>
+          <li>Кислотность: низкая</li>
+          <li>Кофеин: ~2.7%</li>
+          <li>Вкус: орехи, земля, горечь</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-header">
+      <div class="eyebrow">Обжарка</div>
+      <h2>Степень прожарки</h2>
+      <p>Именно обжарка определяет характер вкуса. Одно и то же зерно будет совсем разным в зависимости от температуры.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <table class="recipe-table">
+          <thead>
+            <tr><th>Степень</th><th>Цвет</th><th>Вкус</th><th>Кислотность</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Светлая</td>
+              <td>Светло-коричневый</td>
+              <td>Фрукты, цветы, чай</td>
+              <td>Высокая</td>
+            </tr>
+            <tr>
+              <td>Средняя</td>
+              <td>Молочный шоколад</td>
+              <td>Карамель, орехи, шоколад</td>
+              <td>Средняя</td>
+            </tr>
+            <tr>
+              <td>Тёмная</td>
+              <td>Тёмно-коричневый</td>
+              <td>Горечь, дым, специи</td>
+              <td>Низкая</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-header">
+      <div class="eyebrow">Помол</div>
+      <h2>Размер помола важен</h2>
+    </div>
+    <div class="cards two">
+      <div class="card">
+        <div class="card-icon">🔬</div>
+        <h3>Мелкий помол</h3>
+        <p>Эспрессо. Вода под давлением проходит быстро — нужна мелкая фракция для правильного сопротивления.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧊</div>
+        <h3>Крупный помол</h3>
+        <p>Холодный кофе, пресс-фильтр. Долгий контакт с водой — нужна крупная фракция, иначе будет горчить.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 28px;">
+      <button class="btn btn-primary" onclick="markDone(0); showSection(1)">Следующий раздел →</button>
+    </div>
+  </div>
+
+  <!-- ── SECTION 1: НАПИТКИ ── -->
+  <div class="section" id="sec1">
+    <div class="section-header">
+      <div class="eyebrow">Раздел 2</div>
+      <h2>Классические кофейные напитки</h2>
+      <p>Таблица поможет запомнить состав, объём и характер каждого напитка.</p>
+    </div>
+
+    <div class="card" style="margin-bottom: 24px;">
+      <table class="recipe-table">
+        <thead>
+          <tr><th>Напиток</th><th>Эспрессо</th><th>Молоко</th><th>Объём</th><th>Тип</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Эспрессо</td>
+            <td>1 шот (18 г)</td>
+            <td>—</td>
+            <td>18 мл</td>
+            <td><span class="badge badge-dark">Чёрный</span></td>
+          </tr>
+          <tr>
+            <td>Доппио</td>
+            <td>2 шота (36 г)</td>
+            <td>—</td>
+            <td>36 мл</td>
+            <td><span class="badge badge-dark">Чёрный</span></td>
+          </tr>
+          <tr>
+            <td>Американо</td>
+            <td>2 шота</td>
+            <td>—</td>
+            <td>200 мл</td>
+            <td><span class="badge badge-light">Разбавленный</span></td>
+          </tr>
+          <tr>
+            <td>Капучино</td>
+            <td>1 шот</td>
+            <td>250 мл + пышная пена</td>
+            <td>350 мл</td>
+            <td><span class="badge badge-milk">Молочный</span></td>
+          </tr>
+          <tr>
+            <td>Латте</td>
+            <td>1 шот</td>
+            <td>~200 мл, тонкий слой пены</td>
+            <td>220 мл</td>
+            <td><span class="badge badge-milk">Молочный</span></td>
+          </tr>
+          <tr>
+            <td>Флэт уайт</td>
+            <td>4 шота рестретто</td>
+            <td>120 мл, микропена</td>
+            <td>180 мл</td>
+            <td><span class="badge badge-milk">Молочный</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-header">
+      <div class="eyebrow">Пена</div>
+      <h2>Разница в молоке</h2>
+    </div>
+    <div class="cards two">
+      <div class="card">
+        <div class="card-icon">☁️</div>
+        <h3>Капучино</h3>
+        <p>Пышная плотная пена, «сухая». Ложкой не проваливается. Соотношение: 1/3 эспрессо, 1/3 молоко, 1/3 пена.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🥛</div>
+        <h3>Латте</h3>
+        <p>Тонкий слой микропены — 5–7 мм. Напиток мягче и слаще. Молока значительно больше.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💧</div>
+        <h3>Флэт уайт</h3>
+        <p>Плоская (flat) пена — почти её нет. Четыре шота рестретто делают вкус очень концентрированным, несмотря на молоко.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap;">
+      <button class="btn btn-ghost" onclick="showSection(0)">← Назад</button>
+      <button class="btn btn-primary" onclick="markDone(1); showSection(2)">Следующий раздел →</button>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: СЕРВИС ── -->
+  <div class="section" id="sec2">
+    <div class="section-header">
+      <div class="eyebrow">Раздел 3</div>
+      <h2>Сервис и подача</h2>
+      <p>Знать состав — это половина. Вторая половина — как правильно подать и что ответить гостю.</p>
+    </div>
+
+    <div class="section-header" style="margin-bottom: 16px;">
+      <div class="eyebrow">Подача</div>
+      <h2 style="font-size:1.3rem;">Как подавать кофе</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Прогретая посуда</h4>
+          <p>Чашка для эспрессо и капучино должна быть тёплой. Проверьте на ощупь перед подачей.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Блюдце и ложечка</h4>
+          <p>Подаётся с ложечкой на блюдце. Ложечка — справа, ручка чашки — вправо к гостю.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Стакан воды</h4>
+          <p>К эспрессо и доппио подаётся стакан холодной негазированной воды. Очищает рецепторы.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Сахар</h4>
+          <p>Подаётся на блюдце или в сахарнице. Не добавляйте сахар сами — только по просьбе гостя.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Скорость</h4>
+          <p>Эспрессо — напиток, который «умирает» за 30–60 секунд. Подавайте сразу, не задерживайте на раздаче.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-header">
+      <div class="eyebrow">Диалог с гостем</div>
+      <h2>Частые вопросы и ответы</h2>
+    </div>
+    <div class="tip-list">
+      <div class="tip">
+        <div class="tip-icon">💬</div>
+        <div>
+          <strong>«В чём разница между капучино и латте?»</strong>
+          Капучино — плотная пена, насыщенный вкус кофе. Латте — мягче, больше молока, тонкий слой пены.
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">💬</div>
+        <div>
+          <strong>«Мне не крепкий кофе»</strong>
+          Предложите латте или американо с большим количеством воды. Можно уточнить: «Вы имеете в виду кофеин или вкус?»
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">💬</div>
+        <div>
+          <strong>«Что порекомендуете?»</strong>
+          Задайте уточняющий вопрос: «Вы обычно пьёте с молоком или без?» Не угадывайте — спрашивайте.
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">💬</div>
+        <div>
+          <strong>«У меня кофе холодный»</strong>
+          Извинитесь, заберите чашку. Сообщите бариста. Не спорьте — иногда чашка просто не была прогрета.
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">⚠️</div>
+        <div>
+          <strong>Что нельзя говорить гостю</strong>
+          «Не знаю» (лучше: «уточню»), «это одно и то же» (о напитках), «ну это же кофе» (реагируя на жалобу).
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap;">
+      <button class="btn btn-ghost" onclick="showSection(1)">← Назад</button>
+      <button class="btn btn-primary" onclick="markDone(2); showSection(3)">Перейти к тесту →</button>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3: ТЕСТ ── -->
+  <div class="section" id="sec3">
+    <div class="section-header">
+      <div class="eyebrow">Раздел 4</div>
+      <h2>Проверь себя</h2>
+      <p>10 вопросов по всем разделам. Выбирай ответ и проверяй — объяснение появится сразу после выбора.</p>
+    </div>
+
+    <div class="quiz-wrap" id="quizWrap">
+      <!-- Q1 -->
+      <div class="quiz-q" id="q1">
+        <div class="q-text">1. Какой сорт кофе содержит больше кофеина?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(1,this,false)"><div class="opt-radio"></div> Арабика</div>
+          <div class="quiz-opt" onclick="answer(1,this,true)"><div class="opt-radio"></div> Робуста</div>
+        </div>
+        <div class="hint" id="hint1">Робуста содержит ~2.7% кофеина, арабика — ~1.2%. Именно поэтому робусту добавляют в эспрессо-смеси для «бодрости».</div>
+      </div>
+      <!-- Q2 -->
+      <div class="quiz-q" id="q2">
+        <div class="q-text">2. Тёмная обжарка зерна делает кофе…</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(2,this,false)"><div class="opt-radio"></div> Более кислым и фруктовым</div>
+          <div class="quiz-opt" onclick="answer(2,this,true)"><div class="opt-radio"></div> Более горьким, с низкой кислотностью</div>
+          <div class="quiz-opt" onclick="answer(2,this,false)"><div class="opt-radio"></div> Без разницы — вкус не меняется</div>
+        </div>
+        <div class="hint" id="hint2">При тёмной обжарке натуральные кислоты разрушаются, кофе становится горьким и дымным. Светлая обжарка сохраняет фруктовость.</div>
+      </div>
+      <!-- Q3 -->
+      <div class="quiz-q" id="q3">
+        <div class="q-text">3. Объём классического эспрессо — это…</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(3,this,false)"><div class="opt-radio"></div> 60–80 мл</div>
+          <div class="quiz-opt" onclick="answer(3,this,true)"><div class="opt-radio"></div> 18 мл</div>
+          <div class="quiz-opt" onclick="answer(3,this,false)"><div class="opt-radio"></div> 100–120 мл</div>
+        </div>
+        <div class="hint" id="hint3">Эспрессо — концентрат. В нашем заведении стандартный шот — 18 мл.</div>
+      </div>
+      <!-- Q4 -->
+      <div class="quiz-q" id="q4">
+        <div class="q-text">4. Флэт уайт отличается от капучино тем, что…</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(4,this,false)"><div class="opt-radio"></div> В него добавляют сахар</div>
+          <div class="quiz-opt" onclick="answer(4,this,false)"><div class="opt-radio"></div> Он подаётся холодным</div>
+          <div class="quiz-opt" onclick="answer(4,this,true)"><div class="opt-radio"></div> Пена почти отсутствует, а кофе — четыре порции эспрессо</div>
+        </div>
+        <div class="hint" id="hint4">Флэт уайт — «плоский» напиток: минимальная пена (flat), четыре шота эспрессо, меньший объём. Очень концентрированный.</div>
+      </div>
+      <!-- Q5 -->
+      <div class="quiz-q" id="q5">
+        <div class="q-text">5. Что нужно подать к эспрессо и доппио?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(5,this,false)"><div class="opt-radio"></div> Горячий чай</div>
+          <div class="quiz-opt" onclick="answer(5,this,true)"><div class="opt-radio"></div> Стакан холодной воды</div>
+          <div class="quiz-opt" onclick="answer(5,this,false)"><div class="opt-radio"></div> Ничего дополнительно</div>
+        </div>
+        <div class="hint" id="hint5">Вода нейтрализует послевкусие и «промывает» рецепторы. Это классический стандарт подачи эспрессо.</div>
+      </div>
+      <!-- Q6 -->
+      <div class="quiz-q" id="q6">
+        <div class="q-text">6. Гость говорит «хочу некрепкий кофе». Что уточнить?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(6,this,false)"><div class="opt-radio"></div> Сразу принести латте, он всегда мягкий</div>
+          <div class="quiz-opt" onclick="answer(6,this,true)"><div class="opt-radio"></div> Уточнить: имеет в виду кофеин или вкус</div>
+          <div class="quiz-opt" onclick="answer(6,this,false)"><div class="opt-radio"></div> Объяснить, что некрепкого кофе не бывает</div>
+        </div>
+        <div class="hint" id="hint6">«Некрепкий» может означать и меньше кофеина (тогда декаф или матча), и мягкий вкус (тогда латте). Правильный вопрос экономит время и избегает ошибки.</div>
+      </div>
+      <!-- Q7 -->
+      <div class="quiz-q" id="q7">
+        <div class="q-text">7. В чём разница пены в капучино и латте?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(7,this,true)"><div class="opt-radio"></div> Капучино — плотная пышная пена; латте — тонкий слой микропены</div>
+          <div class="quiz-opt" onclick="answer(7,this,false)"><div class="opt-radio"></div> Латте — плотная, капучино — жидкая</div>
+          <div class="quiz-opt" onclick="answer(7,this,false)"><div class="opt-radio"></div> Пена одинакова, отличается только объём</div>
+        </div>
+        <div class="hint" id="hint7">Именно текстура пены — главное различие. Капучино: 1/3 пышной пены. Латте: гладкая шёлковая микропена, 5–7 мм.</div>
+      </div>
+      <!-- Q8 -->
+      <div class="quiz-q" id="q8">
+        <div class="q-text">8. Как правильно расположить ложечку при подаче чашки?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(8,this,false)"><div class="opt-radio"></div> Слева от чашки</div>
+          <div class="quiz-opt" onclick="answer(8,this,false)"><div class="opt-radio"></div> В чашке вертикально</div>
+          <div class="quiz-opt" onclick="answer(8,this,true)"><div class="opt-radio"></div> На блюдце справа, ручка чашки — вправо</div>
+        </div>
+        <div class="hint" id="hint8">Классический стандарт: ложечка на блюдце справа. Ручка чашки повёрнута к гостю — удобно взять без лишних движений.</div>
+      </div>
+      <!-- Q9 -->
+      <div class="quiz-q" id="q9">
+        <div class="q-text">9. Сколько молока входит в флэт уайт?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(9,this,false)"><div class="opt-radio"></div> 250 мл</div>
+          <div class="quiz-opt" onclick="answer(9,this,true)"><div class="opt-radio"></div> 120 мл</div>
+          <div class="quiz-opt" onclick="answer(9,this,false)"><div class="opt-radio"></div> 200 мл</div>
+        </div>
+        <div class="hint" id="hint9">Флэт уайт — компактный напиток: 120 мл молока с микропеной и 4 шота эспрессо. Общий объём — 180 мл.</div>
+      </div>
+      <!-- Q10 -->
+      <div class="quiz-q" id="q10">
+        <div class="q-text">10. Гость жалуется, что кофе холодный. Как правильно ответить?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(10,this,false)"><div class="opt-radio"></div> «Мы его только что сделали, он не может быть холодным»</div>
+          <div class="quiz-opt" onclick="answer(10,this,false)"><div class="opt-radio"></div> Промолчать и пройти мимо</div>
+          <div class="quiz-opt" onclick="answer(10,this,true)"><div class="opt-radio"></div> Извиниться, забрать чашку, уточнить у бариста и переделать</div>
+        </div>
+        <div class="hint" id="hint10">Спорить с гостем о температуре — худшее, что можно сделать. Извинение + действие = правильная реакция. Скорее всего, чашку просто не прогрели.</div>
+      </div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn btn-primary" onclick="checkScore()" id="btnCheck" style="display:none">Посмотреть результат</button>
+      <button class="btn btn-ghost" onclick="showSection(2)">← К сервису</button>
+    </div>
+
+    <div class="score-box" id="scoreBox">
+      <div class="score-num" id="scoreNum">—</div>
+      <div class="score-msg" id="scoreMsg"></div>
+      <button class="btn btn-primary" onclick="resetQuiz()">Пройти ещё раз</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const totalSections = 4;
+  const done = new Set();
+  let answers = {};
+  let answered = 0;
+  const totalQ = 10;
+
+  // correct answers map
+  const correct = {1:1,2:1,3:1,4:2,5:1,6:1,7:0,8:2,9:1,10:2};
+  // which index (0-based) is correct per question
+  const correctIdx = {1:1,2:1,3:1,4:2,5:1,6:1,7:0,8:2,9:1,10:2};
+
+  function showSection(i) {
+    document.querySelectorAll('.section').forEach((s,idx) => {
+      s.classList.toggle('active', idx === i);
+    });
+    document.querySelectorAll('.tab-btn').forEach((t,idx) => {
+      t.classList.toggle('active', idx === i);
+    });
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function markDone(i) {
+    done.add(i);
+    document.getElementById('tab'+i).classList.add('done');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const pct = Math.round((done.size / totalSections) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = done.size + ' из ' + totalSections + ' разделов';
+  }
+
+  function answer(qNum, el, isCorrect) {
+    const qEl = document.getElementById('q'+qNum);
+    // already answered?
+    if (qEl.dataset.answered) return;
+    qEl.dataset.answered = '1';
+    answered++;
+
+    // mark all options
+    const opts = qEl.querySelectorAll('.quiz-opt');
+    opts.forEach((opt, idx) => {
+      if (opt === el) {
+        opt.classList.add(isCorrect ? 'correct' : 'wrong');
+      } else if (idx === correctIdx[qNum]) {
+        opt.classList.add('correct');
+      }
+    });
+
+    answers[qNum] = isCorrect;
+
+    // show hint
+    document.getElementById('hint'+qNum).classList.add('show');
+
+    // show check button when all answered
+    if (answered >= totalQ) {
+      document.getElementById('btnCheck').style.display = 'inline-block';
+      markDone(3);
+    }
+  }
+
+  function checkScore() {
+    const correct = Object.values(answers).filter(Boolean).length;
+    const pct = Math.round(correct / totalQ * 100);
+    let msg = '';
+    if (pct === 100) msg = 'Идеально! Ты готов работать с любым гостем.';
+    else if (pct >= 70) msg = 'Хороший результат. Повтори слабые места.';
+    else msg = 'Стоит перечитать разделы и попробовать снова.';
+
+    document.getElementById('scoreNum').textContent = correct + '/' + totalQ;
+    document.getElementById('scoreMsg').textContent = msg;
+    document.getElementById('scoreBox').classList.add('show');
+    document.getElementById('btnCheck').style.display = 'none';
+    document.getElementById('scoreBox').scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  function resetQuiz() {
+    // reset answers
+    answers = {};
+    answered = 0;
+    document.getElementById('scoreBox').classList.remove('show');
+    document.getElementById('btnCheck').style.display = 'none';
+
+    for (let i = 1; i <= totalQ; i++) {
+      const qEl = document.getElementById('q'+i);
+      delete qEl.dataset.answered;
+      qEl.querySelectorAll('.quiz-opt').forEach(o => {
+        o.classList.remove('correct','wrong','selected');
+      });
+      document.getElementById('hint'+i).classList.remove('show');
+    }
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+</script>
+</body>
+</html>
